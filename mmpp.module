@@ -1,0 +1,67 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for mmpp module.
+ */
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+
+/**
+ * Implements hook_entity_type_alter().
+ */
+function mmpp_perms_entity_type_alter(array &$entity_types) {
+//dd($entity_types);
+}
+
+
+
+/**
+ * Implements hook_help().
+ */
+function mmpp_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.mmpp':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t("Make My public Profile") . '</p>';
+      return $output;
+  }
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function mmpp_entity_base_field_info(EntityTypeInterface $entity_type) {
+  $fields = [];
+  if ($entity_type->id() === 'user') {
+    $fields['mmpp'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Make My public Profile'))
+      ->setDescription(t('This will allow others to discover you.'))
+      ->setRevisionable(TRUE)
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'settings' => [
+          'display_label' => TRUE,
+        ],
+      ])
+      ->setDisplayConfigurable('form', TRUE);
+  }
+
+  return $fields;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function mmpp_form_user_form_alter(&$form, FormStateInterface $form_state) {
+  if (!\Drupal::currentUser()->hasPermission('access user profile')) {
+    $form['mmpp']['#access'] = FALSE;
+  }
+}
+

@@ -1,0 +1,10 @@
+services:
+  mmpp.route_subscriber:
+    class: Drupal\mmpp\EventSubscriber\MmppRouteSubscriber
+    tags:
+      - { name: event_subscriber }
+
+  access_check.mmpp_access:
+    class: Drupal\mmpp\Access\MmppAccessChecker
+    tags:
+      - { name: access_check }
